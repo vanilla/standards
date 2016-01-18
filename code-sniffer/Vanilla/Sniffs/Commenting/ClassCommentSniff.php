@@ -1,9 +1,22 @@
 <?php
 /**
  * Parses and verifies the doc comments for classes.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 /**
+ * Parses and verifies the doc comments for classes.
+ *
+ * Verifies that :
+ * <ul>
+ *  <li>A class doc comment exists.</li>
+ *  <li>There is exactly one blank line before the class comment.</li>
+ *  <li>Short description ends with a full stop.</li>
+ *  <li>Long description ends with a full stop.</li>
+ *  <li>There is a blank line between the description and the tags.</li>
+ * </ul>
  */
 class Vanilla_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sniff {
 
@@ -117,15 +130,15 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sni
 
         $shortContent = $tokens[$short]['content'];
         // Short desc start with capital letter
-        if (preg_match('#^(\p{Lu}|\P{L})#u', $shortContent) === 0) {
+        if (preg_match('/^\p{Ll}/u', $shortContent) === 1) {
             $error = 'Doc comment short description must start with a capital letter';
             $phpcsFile->addError($error, $short, 'ShortNotCapital');
         }
 
         // Short desc must end with a full stop
         if ($isShortSingleLine && substr($shortContent, -1) !== '.') {
-            $error = 'Description must end with a full stop';
-            $phpcsFile->addError($error, $commentStart, 'MissingShort');
+            $error = 'Short description must end with a full stop';
+            $phpcsFile->addError($error, $commentStart, 'MissingShortFullStop');
         }
 
         // Detect long description
@@ -139,9 +152,30 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sni
                 }
 
                 // Long desc must start with a capital letter
-                if (preg_match('/^(\p{Lu}|\P{L})/u', $tokens[$long]['content'][0]) === 0) {
+                if (preg_match('/^\p{Ll}/u', $tokens[$long]['content']) === 1) {
                     $error = 'Doc comment long description must start with a capital letter';
                     $phpcsFile->addError($error, $long, 'LongNotCapital');
+                }
+
+                // Account for the fact that a long description might cover
+                // multiple lines.
+                $longContent = $tokens[$short]['content'];
+                $longEnd     = $long;
+                for ($i = ($long + 1); $i < $commentEnd; $i++) {
+                    if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
+                        if ($tokens[$i]['line'] === ($tokens[$longEnd]['line'] + 1)) {
+                            $longContent .= $tokens[$i]['content'];
+                            $longEnd      = $i;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                // Long desc must end with a full stop
+                if (substr($longContent, -1) !== '.') {
+                    $error = 'Long description must end with a full stop';
+                    $phpcsFile->addError($error, $commentStart, 'MissingLongFullStop');
                 }
             }//end if
         }
@@ -160,7 +194,5 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sni
             $this->currentFile->addError($error, $commentEnd, 'SpacingAfter');
         }
 
-
-    }//end process()
-
+    }
 }

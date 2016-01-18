@@ -1,6 +1,9 @@
 <?php
 /**
  * Parses and verifies the doc comments for functions.
+
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 /**
@@ -15,8 +18,6 @@
  *  <li>Parameter names represent those in the method</li>
  *  <li>Parameter comments are in the correct order</li>
  *  <li>Parameter comments are complete</li>
- *  <li>A type hint is provided for array and custom class</li>
- *  <li>Type hint matches the actual variable/class type</li>
  *  <li>A blank line is present before the first and after the last parameter</li>
  *  <li>Any throw tag must have a comment</li>
  *  <li>The tag order and indentation are correct</li>
@@ -99,7 +100,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $phpcsFile->addError($error, ($commentStart + 1), 'SpacingBeforeShort');
         }
 
-        // Short desc must be single line.
+        // Short desc must be single line. (Also cover long desc new line before)
         $shortEnd = $short;
         for ($i = ($short + 1); $i < $commentEnd; $i++) {
             if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
@@ -123,39 +124,93 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
         if ($long !== false) {
             if ($tokens[$long]['code'] === T_DOC_COMMENT_STRING) {
 
-                // There must be a blank line before long desc and short desc
-                if ($tokens[$long]['line'] !== ($tokens[$shortEnd]['line'] + 2)) {
-                    $error = 'There must be exactly one blank line between descriptions in a doc comment';
-                }
-
                 // Long desc must start with a capital letter
                 if (preg_match('/^(\p{Lu}|\P{L})/u', $tokens[$long]['content'][0]) === 0) {
                     $error = 'Doc comment long description must start with a capital letter';
                     $phpcsFile->addError($error, $long, 'LongNotCapital');
                 }
+
+                // Account for the fact that a long description might cover
+                // multiple lines.
+                $longContent = $tokens[$short]['content'];
+                $longEnd     = $long;
+                for ($i = ($long + 1); $i < $commentEnd; $i++) {
+                    if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
+                        if ($tokens[$i]['line'] === ($tokens[$longEnd]['line'] + 1)) {
+                            $longContent .= $tokens[$i]['content'];
+                            $longEnd      = $i;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
             }//end if
         }
 
         // Ignore blocks with inheritdoc tags
         $docCommentContent = '';
-        for($i = $commentStart + 1; $i <= $commentEnd - 1; $i++) {
+        for ($i = $commentStart + 1; $i <= $commentEnd - 1; $i++) {
             $docCommentContent .= $tokens[$i]['content'];
         }
+
         if (stristr($docCommentContent, '{@inheritdoc}') !== false) {
             return;
         }
 
-        $commentStart = $tokens[$commentEnd]['comment_opener'];
-        foreach ($tokens[$commentStart]['comment_tags'] as $tag) {
-            if ($tokens[$tag]['content'] === '@see') {
-                // Make sure the tag isn't empty.
-                $string = $phpcsFile->findNext(T_DOC_COMMENT_STRING, $tag, $commentEnd);
-                if ($string === false || $tokens[$string]['line'] !== $tokens[$tag]['line']) {
-                    $error = 'Content missing for @see tag in function comment';
-                    $phpcsFile->addError($error, $tag, 'EmptySees');
+        if (!empty($tokens[$commentStart]['comment_tags'])) {
+            foreach ($tokens[$commentStart]['comment_tags'] as $tag) {
+                if ($tokens[$tag]['content'] === '@see') {
+                    // Make sure the tag isn't empty.
+                    $string = $phpcsFile->findNext(T_DOC_COMMENT_STRING, $tag, $commentEnd);
+                    if ($string === false || $tokens[$string]['line'] !== $tokens[$tag]['line']) {
+                        $error = 'Content missing for @see tag in function comment';
+                        $phpcsFile->addError($error, $tag, 'EmptySees');
+                    }
+                }
+            }
+
+            $nbsTag = count($tokens[$commentStart]['comment_tags']);
+            if ($nbsTag > 1) {
+
+                $firstTag = $tokens[$commentStart]['comment_tags'][0];
+                $prev     = $phpcsFile->findPrevious($empty, ($firstTag - 1), $commentStart, true);
+                if ($tokens[$firstTag]['line'] !== ($tokens[$prev]['line'] + 2)) {
+                    $error = 'There must be exactly one blank line before the first tag in a doc comment';
+                    $phpcsFile->addError($error, $firstTag, 'SpacingBeforeFirstParam');
+                }
+
+                $firstParamTag = null;
+                $lastParamTag = null;
+                foreach ($tokens[$commentStart]['comment_tags'] as $tokenIndex) {
+                    if ($tokens[$tokenIndex]['content'] === '@param') {
+                        if ($firstParamTag === null) {
+                            $firstParamTag = $tokenIndex;
+                        }
+                        $lastParamTag = $tokenIndex;
+                    }
+                }
+
+                // Check that there is a single blank line before the first param.
+                $prev = $phpcsFile->findPrevious($empty, ($firstParamTag - 1), $commentStart, true);
+                if ($firstTag !== $firstParamTag && $tokens[$firstParamTag]['line'] !== ($tokens[$prev]['line'] + 2)) {
+                    $error = 'There must be exactly one blank line before the first param tag in a doc comment';
+                    $phpcsFile->addError($error, $firstParamTag, 'SpacingBeforeFirstParam');
+                }
+
+                // Check that there is a single blank line after the last param
+                // but account for a multi-line param comments.
+                $next = $phpcsFile->findNext(T_DOC_COMMENT_TAG, ($lastParamTag + 3), $commentEnd);
+                if ($next !== false) {
+                    $prev = $phpcsFile->findPrevious(array(T_DOC_COMMENT_TAG, T_DOC_COMMENT_STRING), ($next - 1), $commentStart);
+                    if ($tokens[$next]['line'] !== ($tokens[$prev]['line'] + 2)) {
+                        $error = 'There must be a single blank line after the last param tag';
+                        $phpcsFile->addError($error, $lastParamTag, 'SpacingAfterLastParam');
+                    }
                 }
             }
         }
+
 
         $this->processReturn($phpcsFile, $stackPtr, $commentStart);
         $this->processThrows($phpcsFile, $stackPtr, $commentStart);
@@ -244,7 +299,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             if ($exception === null) {
                 $error = 'Exception type and comment missing for @throws tag in function comment';
                 $phpcsFile->addError($error, $tag, 'InvalidThrows');
-            } else if ($comment === null) {
+            } elseif ($comment === null) {
                 $error = 'Comment missing for @throws tag in function comment';
                 $phpcsFile->addError($error, $tag, 'EmptyThrows');
             } else {
@@ -260,19 +315,17 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
                     }
                 }
 
-                // Starts with a capital letter and ends with a fullstop.
-                if (preg_match('#^(\p{Lu}|\P{L})#u', $comment) === 0) {
+                // Short desc must start with a capital letter.
+                if (preg_match('/^\p{Ll}/u', $comment) === 1) {
                     $error = 'Doc comment short description must start with a capital letter';
                     $phpcsFile->addError($error, ($tag + 2), 'ThrowsNotCapital');
                 }
 
-                // Short desc must end with a full stop
+                // Short desc must end with a full stop.
                 if (substr($comment, -1) !== '.') {
                     $error = 'Description must end with a full stop';
                     $phpcsFile->addError($error, ($tag + 2), 'MissingShort');
                 }
-
-                // TODO: Throw
             }
         }
 
@@ -415,7 +468,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
 
                     $phpcsFile->addError($error, $param['tag'], $code, $data);
                 }
-            } else if (substr($param['var'], -4) !== ',...') {
+            } elseif (substr($param['var'], -4) !== ',...') {
                 // We must have an extra parameter comment.
                 $error = 'Superfluous parameter comment';
                 $phpcsFile->addError($error, $param['tag'], 'ExtraParamComment');
@@ -459,6 +512,5 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $phpcsFile->addError($error, $commentStart, 'MissingParamTag', $data);
         }
 
-    }//end processParams()
-
-}//end class
+    }
+}

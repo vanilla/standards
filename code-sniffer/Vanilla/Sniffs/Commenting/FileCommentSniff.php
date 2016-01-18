@@ -1,12 +1,20 @@
 <?php
 /**
  * Parses and verifies the doc comments for files.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 /**
- * Parses and verifies the file doc comment.
+ * Parses and verifies the doc comments for files.
+ *
+ * Verifies that :
+ * <ul>
+ *  <li>A file doc comment exists.</li>
+ *  <li>Check that license and copyright tags are presents.</li>
+ * </ul>
  */
-
 class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Sniff {
 
     /**
@@ -88,12 +96,11 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
         if ($tokens[$commentStart]['code'] === T_CLOSE_TAG) {
             // We are only interested if this is the first open tag.
             return;
-        } else if ($tokens[$commentStart]['code'] === T_COMMENT) {
+        } elseif ($tokens[$commentStart]['code'] === T_COMMENT) {
             $error = 'You must use "/**" style comments for a file comment';
             $phpcsFile->addError($error, $errorToken, 'WrongStyle');
             return;
-        } else if ($commentStart === false || $tokens[$commentStart]['code'] !== T_DOC_COMMENT_OPEN_TAG
-        ) {
+        } elseif ($commentStart === false || $tokens[$commentStart]['code'] !== T_DOC_COMMENT_OPEN_TAG) {
             $phpcsFile->addError('Missing file doc comment', $errorToken, 'Missing');
             return;
         }
@@ -290,6 +297,5 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
                 $phpcsFile->addError($error, $tag, 'IncompleteLicense');
             }
         }
-    }//end processLicense()
-
-}//end class
+    }
+}
