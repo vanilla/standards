@@ -1,4 +1,4 @@
-# eslint-config-vanillaforums[[![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url]][vanilla-url]
+# eslint-config-vanillaforums[![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url]
 
 [npm-image]: https://img.shields.io/npm/v/eslint-config-vanillaforums.svg
 [npm-url]: https://npmjs.org/package/eslint-config-vanillaforums
