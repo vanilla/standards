@@ -1,0 +1,16 @@
+{
+  "name": "eslint-config-vanillaforums",
+  "version": "1.0.0",
+  "description": "Javascript coding standards for Vanilla Forums. Based off of standard.",
+  "main": "index.js",
+  "repository": "https://github.com/vanilla/standards",
+  "author": "Adam Charron <adam.c@vanillaforums.com>",
+  "license": "MIT",
+  "dependencies": {
+    "eslint-config-standard": "^7.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-node": "^4.2.2",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1"
+  }
+}
