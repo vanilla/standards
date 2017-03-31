@@ -1,0 +1,12 @@
+{
+  "name": "stylelint-config-vanillaforums",
+  "version": "1.0.0",
+  "description": "Vanilla Forums style linting config.",
+  "main": "index.js",
+  "repository": "https://github.com/vanilla/standards",
+  "author": "Adam Charron <adam.c@vanillaforums.com>",
+  "license": "MIT",
+  "dependencies": {
+    "stylelint-config-standard": "^16.0.0"
+  }
+}
