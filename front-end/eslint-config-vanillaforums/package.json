@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-vanillaforums",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Javascript coding standards for Vanilla Forums. Based off of standard.",
   "main": "index.js",
   "repository": "https://github.com/vanilla/standards",
