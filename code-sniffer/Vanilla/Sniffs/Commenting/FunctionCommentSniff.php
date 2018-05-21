@@ -429,7 +429,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $foundParams[] = $param['var'];
 
             // Check number of spaces after the type.
-            $spaces = ($maxType - strlen($param['type']) + 1);
+            $spaces = 1;
             if ($param['type_space'] !== $spaces) {
                 $error = 'Expected %s spaces after parameter type; %s found';
                 $data  = array(
@@ -479,7 +479,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             }
 
             // Check number of spaces after the var name.
-            $spaces = ($maxVar - strlen($param['var']) + 1);
+            $spaces = 1;
             if ($param['var_space'] !== $spaces) {
                 $error = 'Expected %s spaces after parameter name; %s found';
                 $data  = array(
@@ -511,6 +511,5 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $data  = array($neededParam);
             $phpcsFile->addError($error, $commentStart, 'MissingParamTag', $data);
         }
-
     }
 }
