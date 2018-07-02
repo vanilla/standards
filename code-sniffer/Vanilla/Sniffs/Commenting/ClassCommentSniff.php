@@ -6,6 +6,10 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * Parses and verifies the doc comments for classes.
  *
@@ -18,7 +22,7 @@
  *  <li>There is a blank line between the description and the tags.</li>
  * </ul>
  */
-class Vanilla_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sniff {
+class Vanilla_Sniffs_Commenting_ClassCommentSniff implements Sniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -36,20 +40,19 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sni
     /**
      * Processes this test, when one of its tokens is encountered.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the current token
-     *                                        in the stack passed in $tokens.
+     * @param File $phpcsFile The file being scanned.
+     * @param int $stackPtr  The position of the current token in the stack passed in $tokens.
      *
      * @return void
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+    public function process(File $phpcsFile, $stackPtr) {
         $this->currentFile = $phpcsFile;
 
         $tokens    = $phpcsFile->getTokens();
         $type      = strtolower($tokens[$stackPtr]['content']);
         $errorData = array($type);
 
-        $find   = PHP_CodeSniffer_Tokens::$methodPrefixes;
+        $find   = Tokens::$methodPrefixes;
         $find[] = T_WHITESPACE;
 
         $empty = array(

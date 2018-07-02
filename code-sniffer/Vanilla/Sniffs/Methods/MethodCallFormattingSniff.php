@@ -6,10 +6,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+
 /**
  * Class Vanilla_Sniffs_Methods_MethodCallSniff
  */
-class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements PHP_CodeSniffer_Sniff {
+class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -22,11 +25,11 @@ class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements PHP_CodeSniffe
 
 
     /**
-     * @param PHP_CodeSniffer_File $phpcsFile
+     * @param File $phpcsFile
      * @param int $stackPtr
      * @return null
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+    public function process(File $phpcsFile, $stackPtr) {
         $tokens = $phpcsFile->getTokens();
 
         $pointer = $stackPtr + 1;

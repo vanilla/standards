@@ -13,10 +13,14 @@
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Common;
+
 /**
  * Ensures classes are in camel caps, and the first letter is capitalised or begin with "Gdn_".
  */
-class Vanilla_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer_Sniff {
+class Vanilla_Sniffs_Classes_ValidClassNameSniff implements Sniff {
 
 
     /**
@@ -36,13 +40,13 @@ class Vanilla_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer_Snif
     /**
      * Processes this test, when one of its tokens is encountered.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The current file being processed.
+     * @param File $phpcsFile The current file being processed.
      * @param int $stackPtr The position of the current token in the
      *                                        stack passed in $tokens.
      *
      * @return void
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+    public function process(File $phpcsFile, $stackPtr) {
         $tokens = $phpcsFile->getTokens();
 
         if (isset($tokens[$stackPtr]['scope_opener']) === false) {
@@ -66,7 +70,7 @@ class Vanilla_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer_Snif
         }
 
         // Check for camel caps format.
-        $valid = PHP_CodeSniffer::isCamelCaps($name, true, true, false);
+        $valid = Common::isCamelCaps($name, true, true, false);
         if ($valid === false) {
             $type = ucfirst($tokens[$stackPtr]['content']);
             $error = '%s name "%s" is not in camel caps format';

@@ -7,11 +7,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
 
 /**
  * A test to ensure that arrays conform to the array coding standard.
  */
-class Vanilla_Sniffs_Arrays_ArrayDeclarationSniff implements PHP_CodeSniffer_Sniff {
+class Vanilla_Sniffs_Arrays_ArrayDeclarationSniff implements Sniff {
 
 
     /**
@@ -31,13 +33,13 @@ class Vanilla_Sniffs_Arrays_ArrayDeclarationSniff implements PHP_CodeSniffer_Sni
     /**
      * Processes this sniff, when one of its tokens is encountered.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The current file being checked.
+     * @param File $phpcsFile The current file being checked.
      * @param int $stackPtr The position of the current token in
      *                                        the stack passed in $tokens.
      *
      * @return void
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+    public function process(File $phpcsFile, $stackPtr) {
         $tokens = $phpcsFile->getTokens();
 
         if ($tokens[$stackPtr]['code'] === T_ARRAY) {
@@ -65,15 +67,14 @@ class Vanilla_Sniffs_Arrays_ArrayDeclarationSniff implements PHP_CodeSniffer_Sni
     /**
      * Processes a single-line array definition.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The current file being checked.
-     * @param int $stackPtr The position of the current token
-     *                                         in the stack passed in $tokens.
+     * @param File $phpcsFile The current file being checked.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      * @param int $arrayStart The token that starts the array definition.
      * @param int $arrayEnd The token that ends the array definition.
      *
      * @return void
      */
-    public function processSingleLineArray(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $arrayStart, $arrayEnd) {
+    public function processSingleLineArray(File $phpcsFile, $stackPtr, $arrayStart, $arrayEnd) {
         $tokens = $phpcsFile->getTokens();
 
         // Check if there are multiple values. If so, then it has to be multiple lines

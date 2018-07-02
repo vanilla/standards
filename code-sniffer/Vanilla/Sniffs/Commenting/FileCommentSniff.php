@@ -6,6 +6,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+
 /**
  * Parses and verifies the doc comments for files.
  *
@@ -15,7 +18,7 @@
  *  <li>Check that license and copyright tags are presents.</li>
  * </ul>
  */
-class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Sniff {
+class Vanilla_Sniffs_Commenting_FileCommentSniff implements Sniff {
 
     /**
      * A list of tokenizers this sniff supports.
@@ -28,16 +31,9 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
     );
 
     /**
-     * The header comment parser for the current file.
-     *
-     * @var PHP_CodeSniffer_Comment_Parser_ClassCommentParser
-     */
-    protected $commentParser = null;
-
-    /**
      * The current PHP_CodeSniffer_File object we are processing.
      *
-     * @var PHP_CodeSniffer_File
+     * @var File
      */
     protected $currentFile = null;
 
@@ -71,13 +67,12 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
     /**
      * Processes this test, when one of its tokens is encountered.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the current token
-     *                                        in the stack passed in $tokens.
+     * @param File $phpcsFile The file being scanned.
+     * @param int $stackPtr  The position of the current token in the stack passed in $tokens.
      *
      * @return int
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+    public function process(File $phpcsFile, $stackPtr) {
         $tokens = $phpcsFile->getTokens();
 
         $empty = array(
@@ -140,14 +135,13 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
     /**
      * Processes each required or optional tag.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile    The file being scanned.
-     * @param int                  $stackPtr     The position of the current token
-     *                                           in the stack passed in $tokens.
-     * @param int                  $commentStart Position in the stack where the comment started.
+     * @param File $phpcsFile The file being scanned.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
+     * @param int $commentStart Position in the stack where the comment started.
      *
      * @return void
      */
-    protected function processTags(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $commentStart) {
+    protected function processTags(File $phpcsFile, $stackPtr, $commentStart) {
         $tokens = $phpcsFile->getTokens();
 
         if (get_class($this) === 'PEAR_Sniffs_Commenting_FileCommentSniff') {
@@ -237,12 +231,12 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
     /**
      * Process the copyright tags.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param array                $tags      The tokens for these tags.
+     * @param File $phpcsFile The file being scanned.
+     * @param array $tags The tokens for these tags.
      *
      * @return void
      */
-    protected function processCopyright(PHP_CodeSniffer_File $phpcsFile, array $tags) {
+    protected function processCopyright(File $phpcsFile, array $tags) {
         $vanillaFound = false;
         $tokens = $phpcsFile->getTokens();
         foreach ($tags as $tag) {
@@ -276,12 +270,12 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
     /**
      * Process the license tag.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param array                $tags      The tokens for these tags.
+     * @param File $phpcsFile The file being scanned.
+     * @param array $tags The tokens for these tags.
      *
      * @return void
      */
-    protected function processLicense(PHP_CodeSniffer_File $phpcsFile, array $tags) {
+    protected function processLicense(File $phpcsFile, array $tags) {
         $tokens = $phpcsFile->getTokens();
         foreach ($tags as $tag) {
             if ($tokens[($tag + 2)]['code'] !== T_DOC_COMMENT_STRING) {
