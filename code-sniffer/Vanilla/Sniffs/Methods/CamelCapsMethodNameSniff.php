@@ -12,9 +12,9 @@
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
-if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false) {
-    throw new PHP_CodeSniffer_Exception('Class PHP_CodeSniffer_Standards_AbstractScopeSniff not found');
-}
+use PHP_CodeSniffer\Sniffs\AbstractScopeSniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Common;
 
 /**
  * PSR1_Sniffs_Methods_CamelCapsMethodNameSniff.
@@ -29,7 +29,7 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false
  * @version   Release: @package_version@
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
+class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
 {
 
     protected $magicMethods = [
@@ -51,14 +51,13 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
     /**
      * Processes the tokens within the scope.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being processed.
-     * @param int                  $stackPtr  The position where this token was
-     *                                        found.
-     * @param int                  $currScope The position of the current scope.
+     * @param File $phpcsFile The file being processed.
+     * @param int $stackPtr  The position where this token was found.
+     * @param int $currScope The position of the current scope.
      *
      * @return void
      */
-    protected function processTokenWithinScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $currScope)
+    protected function processTokenWithinScope(File $phpcsFile, $stackPtr, $currScope)
     {
         $methodName = $phpcsFile->getDeclarationName($stackPtr);
         if ($methodName === null) {
@@ -81,7 +80,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
                 $phpcsFile->addError($error, $stackPtr, 'NotVanilla', $errorData);
             }
 
-        } elseif (!PHP_CodeSniffer::isCamelCaps($testName, false, true, false)) {
+        } elseif (!Common::isCamelCaps($testName, false, true, false)) {
             $error     = 'Method name "%s" is not in camel caps format';
             $className = $phpcsFile->getDeclarationName($currScope);
             $errorData = array($className.'::'.$methodName);
@@ -117,7 +116,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
 
         $parts = preg_split('/_/', $name);
         foreach ($parts as $part) {
-            if (PHP_CodeSniffer::isCamelCaps($part, false, true, false) === false) {
+            if (Common::isCamelCaps($part, false, true, false) === false) {
                 return false;
             }
         }
@@ -128,13 +127,12 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
     /**
      * Processes the tokens outside the scope.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being processed.
-     * @param int                  $stackPtr  The position where this token was
-     *                                        found.
+     * @param File $phpcsFile The file being processed.
+     * @param int $stackPtr  The position where this token was found.
      *
      * @return void
      */
-    protected function processTokenOutsideScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processTokenOutsideScope(File $phpcsFile, $stackPtr)
     {
         $functionName = $phpcsFile->getDeclarationName($stackPtr);
         if ($functionName === null) {
@@ -154,7 +152,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
             }
 
         } else {
-            if (PHP_CodeSniffer::isCamelCaps($functionName, false, true, false) === false) {
+            if (Common::isCamelCaps($functionName, false, true, false) === false) {
                 $error     = 'Function name "%s" is not in valid vanilla format';
                 $errorData = array($functionName);
                 $phpcsFile->addError($error, $stackPtr, 'globalFunctionNaming', $errorData);
