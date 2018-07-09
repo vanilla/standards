@@ -196,7 +196,8 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
 
                 // Check that there is a single blank line before the first param.
                 $prev = $phpcsFile->findPrevious($empty, ($firstParamTag - 1), $commentStart, true);
-                if ($firstTag !== $firstParamTag && $tokens[$firstParamTag]['line'] !== ($tokens[$prev]['line'] + 2)) {
+
+                if ($firstTag !== $firstParamTag && isset($tokens[$firstParamTag]['line']) && $tokens[$firstParamTag]['line'] !== ($tokens[$prev]['line'] + 2)) {
                     $error = 'There must be exactly one blank line before the first param tag in a doc comment';
                     $phpcsFile->addError($error, $firstParamTag, 'SpacingBeforeFirstParam');
                 }
