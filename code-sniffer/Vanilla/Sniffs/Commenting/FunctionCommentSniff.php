@@ -37,7 +37,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
     public function register() {
         return array(T_FUNCTION);
 
-    }//end register()
+    }
 
 
     /**
@@ -103,52 +103,11 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             $phpcsFile->addError($error, ($commentStart + 1), 'SpacingBeforeShort');
         }
 
-        // Short desc must be single line. (Also cover long desc new line before)
-        $shortEnd = $short;
-        for ($i = ($short + 1); $i < $commentEnd; $i++) {
-            if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
-                if ($tokens[$i]['line'] === ($tokens[$shortEnd]['line'] + 1)) {
-                    $error = 'Class comment short description must be on a single line';
-                    $phpcsFile->addError($error, ($commentStart + 1), 'ShortSingleLine');
-                }
-                break;
-            }
-        }
-
         $shortContent = $tokens[$short]['content'];
         // Short desc start with capital letter
         if (preg_match('#^(\p{Lu}|\P{L})#u', $shortContent) === 0) {
             $error = 'Doc comment short description must start with a capital letter';
             $phpcsFile->addError($error, $short, 'ShortNotCapital');
-        }
-
-        // Detect long description
-        $long = $phpcsFile->findNext($empty, ($shortEnd + 1), ($commentEnd - 1), true);
-        if ($long !== false) {
-            if ($tokens[$long]['code'] === T_DOC_COMMENT_STRING) {
-
-                // Long desc must start with a capital letter
-                if (preg_match('/^(\p{Lu}|\P{L})/u', $tokens[$long]['content'][0]) === 0) {
-                    $error = 'Doc comment long description must start with a capital letter';
-                    $phpcsFile->addError($error, $long, 'LongNotCapital');
-                }
-
-                // Account for the fact that a long description might cover
-                // multiple lines.
-                $longContent = $tokens[$short]['content'];
-                $longEnd     = $long;
-                for ($i = ($long + 1); $i < $commentEnd; $i++) {
-                    if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
-                        if ($tokens[$i]['line'] === ($tokens[$longEnd]['line'] + 1)) {
-                            $longContent .= $tokens[$i]['content'];
-                            $longEnd      = $i;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-            }//end if
         }
 
         // Ignore blocks with inheritdoc tags
@@ -262,13 +221,8 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                 $error = 'Return type missing for @return tag in function comment';
                 $phpcsFile->addError($error, $return, 'MissingReturnType');
             }
-        } else {
-            $error = 'Missing @return tag in function comment';
-            $phpcsFile->addError($error, $tokens[$commentStart]['comment_closer'], 'MissingReturn');
-        }//end if
-
+        }
     }//end processReturn()
-
 
     /**
      * Process any throw tags that this function comment has.
@@ -395,9 +349,6 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                                 $comment .= ' '.$tokens[$i]['content'];
                             }
                         }
-                    } else {
-                        $error = 'Missing parameter comment';
-                        $phpcsFile->addError($error, $tag, 'MissingParamComment');
                     }
                 } else {
                     $error = 'Missing parameter name';
