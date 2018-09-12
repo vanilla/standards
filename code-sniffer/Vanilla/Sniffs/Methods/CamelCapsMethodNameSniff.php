@@ -102,7 +102,14 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
             '_before',
             '_override',
             '_after',
-            'controller_'
+            'controller_',
+            'get_',
+            'patch_',
+            'post_',
+            'index_',
+            'put_',
+            'options_',
+            'delete_',
         );
         foreach ($patterns as $pattern) {
             if (stristr($name, $pattern) !== false) {
