@@ -104,7 +104,6 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
             '_after',
             'controller_',
             'get_',
-            'post_',
             'patch_',
             'post_',
             'index_',
