@@ -288,12 +288,16 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
      */
     protected function processParams(File $phpcsFile, $stackPtr, $commentStart) {
         $tokens = $phpcsFile->getTokens();
+        $hasInheritDoc = false;
 
         // Validate params structure
         $params  = array();
         $maxType = 0;
         $maxVar  = 0;
         foreach ($tokens[$commentStart]['comment_tags'] as $pos => $tag) {
+            if ($tokens[$tag]['content'] === "@inheritdoc") {
+                $hasInheritDoc = true;
+            }
             if ($tokens[$tag]['content'] !== '@param') {
                 continue;
             }
@@ -446,11 +450,13 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
         }
 
         // Report missing comments.
-        $diff = array_diff($realNames, $foundParams);
-        foreach ($diff as $neededParam) {
-            $error = 'Doc comment for parameter "%s" missing';
-            $data  = array($neededParam);
-            $phpcsFile->addError($error, $commentStart, 'MissingParamTag', $data);
+        if (!$hasInheritDoc) {
+            $diff = array_diff($realNames, $foundParams);
+            foreach ($diff as $neededParam) {
+                $error = 'Doc comment for parameter "%s" missing';
+                $data  = array($neededParam);
+                $phpcsFile->addError($error, $commentStart, 'MissingParamTag', $data);
+            }
         }
     }
 }
