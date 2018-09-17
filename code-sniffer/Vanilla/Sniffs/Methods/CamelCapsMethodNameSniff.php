@@ -102,6 +102,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
             '_before',
             '_override',
             '_after',
+            '_init',
             'controller_',
             'get_',
             'patch_',
