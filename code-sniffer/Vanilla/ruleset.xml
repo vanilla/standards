@@ -58,7 +58,7 @@
     <!-- Increase lineLimit to 120 characters -->
     <rule ref="Generic.Files.LineLength">
         <properties>
-        <property name="lineLimit" value="120"/>
+        <property name="lineLimit" value="150"/>
         <property name="absoluteLineLimit" value="180"/>
      </properties>
 
