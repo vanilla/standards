@@ -55,10 +55,10 @@
     <!-- camelCase or Vanilla Events -->
     <rule ref="Vanilla.Methods.CamelCapsMethodName"/>
 
-    <!-- Increase lineLimit to 150 characters -->
+    <!-- Increase lineLimit to 120 characters -->
     <rule ref="Generic.Files.LineLength">
         <properties>
-        <property name="lineLimit" value="150"/>
+        <property name="lineLimit" value="120"/>
         <property name="absoluteLineLimit" value="180"/>
      </properties>
 
