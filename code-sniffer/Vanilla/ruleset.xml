@@ -19,6 +19,28 @@
         <exclude name="PSR2.Classes.PropertyDeclaration" />
     </rule>
 
+    <config name="installed_paths" value="../../vendor/slevomat/coding-standard"/>
+    <config name="installed_paths" value="../../vanilla/standards/vendor/slevomat/coding-standard"/>
+
+    <!-- Trailing array commas -->
+    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
+
+    <!-- Docblock validation -->
+    <!--
+        - Checks for missing property types in phpDoc @var.
+        - Checks for missing typehints in case they can be declared natively. If the phpDoc contains something that can   be written as a native PHP 7.0, 7.1 or 7.2 typehint, this sniff reports that.
+        - Checks for missing @return and/or native return typehint in case the method body contains return with a value.
+        - Checks for useless doc comments. If the native method declaration contains everything and the phpDoc does not   add anything useful, it's reported as useless and can optionally be automatically removed with phpcbf.
+        - Some phpDocs might still be useful even if they do not add any typehint information. They can contain textual   descriptions of code elements and also some meaningful annotations like @expectException or @dataProvider.
+        - Forces to specify what's in traversable types like array, iterable and \Traversable.
+    -->
+    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration" />
+    <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations" />
+    <rule ref="SlevomatCodingStandard.Commenting.ForbiddenComments" />
+    <rule ref="SlevomatCodingStandard.Commenting.EmptyComment" />
+    <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration" />
+    <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing" />
+
     <!-- Ensure there's no use of deprecated functions -->
     <rule ref="Generic.PHP.DeprecatedFunctions"/>
 
@@ -44,7 +66,6 @@
         <exclude name="Vanilla.Commenting.FileComment.DuplicateCopyrightTag" />
     </rule>
     <rule ref="Vanilla.Commenting.ClassComment"/>
-    <rule ref="Vanilla.Commenting.FunctionComment"/>
 
     <!-- StegosaurusCase class names, underscores allowed -->
     <rul ref="Vanilla.Classes.ValidClassName" />
