@@ -116,7 +116,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             $docCommentContent .= $tokens[$i]['content'];
         }
 
-        if (stristr($docCommentContent, '{@inheritdoc}') !== false) {
+        if (stristr($docCommentContent, '@inheritdoc') !== false) {
             return;
         }
 

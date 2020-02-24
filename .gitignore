@@ -17,3 +17,4 @@ nbproject/project.xml
 /build/*
 !/build/build.xml
 !/build/package-contents.txt
+composer.lock
