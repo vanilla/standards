@@ -1,10 +1,10 @@
 <?php
 /**
- * Verifies method calls formatting.
-
- * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
+
+namespace Vanilla\Sniffs\Methods;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -12,7 +12,7 @@ use PHP_CodeSniffer\Files\File;
 /**
  * Class Vanilla_Sniffs_Methods_MethodCallSniff
  */
-class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
+class MethodCallFormattingSniff implements Sniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -40,7 +40,7 @@ class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
         if ($objectCalls['calls']
             && !$objectCalls['hasChaining']
             && $tokens[$pointer]['code'] === T_SEMICOLON
-            && $tokens[$pointer-1]['code'] === T_WHITESPACE) {
+            && $tokens[$pointer - 1]['code'] === T_WHITESPACE) {
 
             $error = 'Semicolon must be at the end of the function when not chaining calls.';
             $phpcsFile->addError($error, $pointer, 'SemicolonWhiteSpace');
@@ -79,6 +79,7 @@ class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
                 $chainedCalls['hasChaining'] = true;
             }
         }
+
         return $chainedCalls;
     }
 
@@ -93,6 +94,7 @@ class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
         if ($token['code'] === T_OPEN_PARENTHESIS) {
             return 'method';
         }
+
         return 'property';
     }
 
@@ -111,6 +113,7 @@ class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
             }
             ++$pointer;
         }
+
         return $hasLineFeed;
     }
 
@@ -128,8 +131,10 @@ class Vanilla_Sniffs_Methods_MethodCallFormattingSniff implements Sniff {
         if ($token['code'] === T_OPEN_PARENTHESIS) {
             $pointer = $token['parenthesis_closer'] + 1;
         }
+
         return $this->moveToNextNonWhitespace($tokens, $pointer);
     }
 
 }
+
 ?>

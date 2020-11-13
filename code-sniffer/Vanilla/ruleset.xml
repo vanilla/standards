@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="Vanilla">
-    <description>Vanilla coding standard</description>
+    <description>Vanilla Coding Standard</description>
 
     <exclude-pattern>*/views/*</exclude-pattern>
     <exclude-pattern>*/design/*</exclude-pattern>

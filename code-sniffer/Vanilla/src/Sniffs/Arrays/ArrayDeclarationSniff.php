@@ -7,14 +7,15 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+namespace Vanilla\Sniffs\Arrays;
+
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 
 /**
  * A test to ensure that arrays conform to the array coding standard.
  */
-class Vanilla_Sniffs_Arrays_ArrayDeclarationSniff implements Sniff {
-
+class ArrayDeclarationSniff implements Sniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -22,13 +23,11 @@ class Vanilla_Sniffs_Arrays_ArrayDeclarationSniff implements Sniff {
      * @return array
      */
     public function register() {
-        return array(
+        return [
             T_ARRAY,
             T_OPEN_SHORT_ARRAY,
-        );
-
-    }//end register()
-
+        ];
+    }
 
     /**
      * Processes this sniff, when one of its tokens is encountered.

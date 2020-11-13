@@ -1,10 +1,10 @@
 <?php
 /**
- * Parses and verifies the doc comments for files.
- *
- * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
+
+namespace Vanilla\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -18,17 +18,17 @@ use PHP_CodeSniffer\Files\File;
  *  <li>Check that license and copyright tags are presents.</li>
  * </ul>
  */
-class Vanilla_Sniffs_Commenting_FileCommentSniff implements Sniff {
+class FileCommentSniff implements Sniff {
 
     /**
      * A list of tokenizers this sniff supports.
      *
      * @var array
      */
-    public $supportedTokenizers = array(
+    public $supportedTokenizers = [
         'PHP',
         'JS',
-    );
+    ];
 
     /**
      * The current PHP_CodeSniffer_File object we are processing.
@@ -42,16 +42,16 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements Sniff {
      *
      * @var array
      */
-    protected $tags = array(
-        '@copyright'  => array(
-            'required'       => true,
+    protected $tags = [
+        '@copyright' => [
+            'required' => true,
             'allow_multiple' => true,
-        ),
-        '@license'    => array(
-            'required'       => false,
+        ],
+        '@license' => [
+            'required' => false,
             'allow_multiple' => false,
-        ),
-    );
+        ],
+    ];
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -59,7 +59,7 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements Sniff {
      * @return array
      */
     public function register() {
-        return array(T_OPEN_TAG);
+        return [T_OPEN_TAG];
 
     }
 
@@ -67,7 +67,7 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements Sniff {
      * Processes this test, when one of its tokens is encountered.
      *
      * @param File $phpcsFile The file being scanned.
-     * @param int $stackPtr  The position of the current token in the stack passed in $tokens.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      */
     public function process(File $phpcsFile, $stackPtr) {
         $tokens = $phpcsFile->getTokens();
@@ -86,16 +86,18 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements Sniff {
         } elseif ($tokens[$commentStart]['code'] === T_COMMENT) {
             $error = 'You must use "/**" style comments for a file comment';
             $phpcsFile->addError($error, $errorToken, 'WrongStyle');
+
             return;
         } elseif ($commentStart === false || $tokens[$commentStart]['code'] !== T_DOC_COMMENT_OPEN_TAG) {
             $phpcsFile->addError('Missing file doc comment', $errorToken, 'Missing');
+
             return;
         }
 
         $commentEnd = $tokens[$commentStart]['comment_closer'];
 
         // No blank line between the open tag and the file comment.
-        if ($tokens[$commentStart]['line'] -1 !== $tokens[$stackPtr]['line']) {
+        if ($tokens[$commentStart]['line'] - 1 !== $tokens[$stackPtr]['line']) {
             $error = 'File comment must be right below the open tag.';
             $phpcsFile->addError($error, $errorToken, 'WrongStyle');
         }

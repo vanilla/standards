@@ -3,7 +3,12 @@
     "description": "Rules for Vanilla forums' coding standards.",
     "license": "GPL-2.0",
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.2",
         "squizlabs/php_codesniffer": "~3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vanilla\\Sniffs\\": "code-sniffer/Vanilla/src/Sniffs"
+        }
     }
 }

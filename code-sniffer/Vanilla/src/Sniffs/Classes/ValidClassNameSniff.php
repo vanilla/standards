@@ -1,17 +1,10 @@
 <?php
 /**
- * Squiz_Sniffs_Classes_ValidClassNameSniff.
- *
- * PHP version 5
- *
- * @category  PHP
- * @package   PHP_CodeSniffer
- * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
- * @copyright 2006-2014 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @link      http://pear.php.net/package/PHP_CodeSniffer
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
+
+namespace Vanilla\Sniffs\Classes;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -20,7 +13,7 @@ use PHP_CodeSniffer\Util\Common;
 /**
  * Ensures classes are in camel caps, and the first letter is capitalised or begin with "Gdn_".
  */
-class Vanilla_Sniffs_Classes_ValidClassNameSniff implements Sniff {
+class ValidClassNameSniff implements Sniff {
 
 
     /**
@@ -29,10 +22,10 @@ class Vanilla_Sniffs_Classes_ValidClassNameSniff implements Sniff {
      * @return array
      */
     public function register() {
-        return array(
+        return [
             T_CLASS,
             T_INTERFACE,
-        );
+        ];
 
     }//end register()
 
@@ -51,8 +44,9 @@ class Vanilla_Sniffs_Classes_ValidClassNameSniff implements Sniff {
 
         if (isset($tokens[$stackPtr]['scope_opener']) === false) {
             $error = 'Possible parse error: %s missing opening or closing brace';
-            $data = array($tokens[$stackPtr]['content']);
+            $data = [$tokens[$stackPtr]['content']];
             $phpcsFile->addWarning($error, $stackPtr, 'MissingBrace', $data);
+
             return;
         }
 
@@ -74,10 +68,10 @@ class Vanilla_Sniffs_Classes_ValidClassNameSniff implements Sniff {
         if ($valid === false) {
             $type = ucfirst($tokens[$stackPtr]['content']);
             $error = '%s name "%s" is not in camel caps format';
-            $data = array(
+            $data = [
                 $type,
                 $name,
-            );
+            ];
             $phpcsFile->addError($error, $stackPtr, 'NotCamelCaps', $data);
         }
 

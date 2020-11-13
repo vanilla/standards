@@ -1,10 +1,10 @@
 <?php
 /**
- * Parses and verifies the doc comments for functions.
-
- * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
+
+namespace Vanilla\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -27,7 +27,7 @@ use PHP_CodeSniffer\Util\Tokens;
  *  <li>The tag order and indentation are correct</li>
  * </ul>
  */
-class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
+class FunctionCommentSniff implements Sniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -35,7 +35,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
      * @return array
      */
     public function register() {
-        return array(T_FUNCTION);
+        return [T_FUNCTION];
 
     }
 
@@ -44,19 +44,19 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
      * Processes this test, when one of its tokens is encountered.
      *
      * @param File $phpcsFile The file being scanned.
-     * @param int $stackPtr  The position of the current token in the stack passed in $tokens.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      *
      * @return void
      */
     public function process(File $phpcsFile, $stackPtr) {
         $tokens = $phpcsFile->getTokens();
-        $find   = Tokens::$methodPrefixes;
+        $find = Tokens::$methodPrefixes;
         $find[] = T_WHITESPACE;
 
-        $empty = array(
+        $empty = [
             T_DOC_COMMENT_WHITESPACE,
             T_DOC_COMMENT_STAR,
-        );
+        ];
 
         $commentEnd = $phpcsFile->findPrevious($find, ($stackPtr - 1), null, true);
         if ($tokens[$commentEnd]['code'] === T_COMMENT) {
@@ -74,11 +74,13 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             && $tokens[$commentEnd]['code'] !== T_COMMENT
         ) {
             $phpcsFile->addError('Missing function doc comment', $stackPtr, 'Missing');
+
             return;
         }
 
         if ($tokens[$commentEnd]['code'] === T_COMMENT) {
             $phpcsFile->addError('You must use "/**" style comments for a function comment', $stackPtr, 'WrongStyle');
+
             return;
         }
         $commentStart = $tokens[$commentEnd]['comment_opener'];
@@ -94,6 +96,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
         if ($short === false) {
             $error = 'Missing short description in class doc comment';
             $phpcsFile->addError($error, $commentStart, 'MissingShort');
+
             return;
         }
 
@@ -136,7 +139,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             if ($nbsTag > 1) {
 
                 $firstTag = $tokens[$commentStart]['comment_tags'][0];
-                $prev     = $phpcsFile->findPrevious($empty, ($firstTag - 1), $commentStart, true);
+                $prev = $phpcsFile->findPrevious($empty, ($firstTag - 1), $commentStart, true);
                 if ($tokens[$firstTag]['line'] !== ($tokens[$prev]['line'] + 2)) {
                     $error = 'There must be exactly one blank line before the first tag in a doc comment';
                     $phpcsFile->addError($error, $firstTag, 'SpacingBeforeFirstParam');
@@ -174,8 +177,8 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
     /**
      * Process the return comment of this function comment.
      *
-     * @param File $phpcsFile    The file being scanned.
-     * @param int $stackPtr     The position of the current token in the stack passed in $tokens.
+     * @param File $phpcsFile The file being scanned.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      * @param int $commentStart The position in the stack where the comment started.
      *
      * @return void
@@ -184,7 +187,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
         $tokens = $phpcsFile->getTokens();
 
         // Skip constructor and destructor.
-        $methodName      = $phpcsFile->getDeclarationName($stackPtr);
+        $methodName = $phpcsFile->getDeclarationName($stackPtr);
         $isSpecialMethod = ($methodName === '__construct' || $methodName === '__destruct');
 
         $return = null;
@@ -193,6 +196,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                 if ($return !== null) {
                     $error = 'Only 1 @return tag is allowed in a function comment';
                     $phpcsFile->addError($error, $tag, 'DuplicateReturn');
+
                     return;
                 }
 
@@ -216,8 +220,8 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
     /**
      * Process any throw tags that this function comment has.
      *
-     * @param File $phpcsFile    The file being scanned.
-     * @param int $stackPtr     The position of the current token in the stack passed in $tokens.
+     * @param File $phpcsFile The file being scanned.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      * @param int $commentStart The position in the stack where the comment started.
      *
      * @return void
@@ -231,9 +235,9 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             }
 
             $exception = null;
-            $comment   = null;
+            $comment = null;
             if ($tokens[($tag + 2)]['code'] === T_DOC_COMMENT_STRING) {
-                $matches = array();
+                $matches = [];
                 preg_match('/([^\s]+)(?:\s+(.*))?/', $tokens[($tag + 2)]['content'], $matches);
                 $exception = $matches[1];
                 if (isset($matches[2]) === true && trim($matches[2]) !== '') {
@@ -256,7 +260,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                 }
                 for ($i = ($tag + 3); $i < $end; $i++) {
                     if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
-                        $comment .= ' '.$tokens[$i]['content'];
+                        $comment .= ' ' . $tokens[$i]['content'];
                     }
                 }
 
@@ -280,8 +284,8 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
     /**
      * Process the function parameter comments.
      *
-     * @param File $phpcsFile    The file being scanned.
-     * @param int $stackPtr     The position of the current token in the stack passed in $tokens.
+     * @param File $phpcsFile The file being scanned.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      * @param int $commentStart The position in the stack where the comment started.
      *
      * @return void
@@ -291,9 +295,9 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
         $hasInheritDoc = false;
 
         // Validate params structure
-        $params  = array();
+        $params = [];
         $maxType = 0;
-        $maxVar  = 0;
+        $maxVar = 0;
         foreach ($tokens[$commentStart]['comment_tags'] as $pos => $tag) {
             if ($tokens[$tag]['content'] === "@inheritdoc") {
                 $hasInheritDoc = true;
@@ -302,25 +306,25 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                 continue;
             }
 
-            $type      = '';
+            $type = '';
             $typeSpace = 0;
-            $var       = '';
-            $varSpace  = 0;
-            $comment   = '';
+            $var = '';
+            $varSpace = 0;
+            $comment = '';
             if ($tokens[($tag + 2)]['code'] === T_DOC_COMMENT_STRING) {
-                $matches = array();
+                $matches = [];
                 preg_match('/([^$&]+)(?:((?:\$|&)[^\s]+)(?:(\s+)(.*))?)?/', $tokens[($tag + 2)]['content'], $matches);
 
-                $typeLen   = strlen($matches[1]);
-                $type      = trim($matches[1]);
+                $typeLen = strlen($matches[1]);
+                $type = trim($matches[1]);
                 $typeSpace = ($typeLen - strlen($type));
-                $typeLen   = strlen($type);
+                $typeLen = strlen($type);
                 if ($typeLen > $maxType) {
                     $maxType = $typeLen;
                 }
 
                 if (isset($matches[2]) === true) {
-                    $var    = $matches[2];
+                    $var = $matches[2];
                     $varLen = strlen($var);
                     if ($varLen > $maxVar) {
                         $maxVar = $varLen;
@@ -328,7 +332,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
 
                     if (isset($matches[4]) === true) {
                         $varSpace = strlen($matches[3]);
-                        $comment  = $matches[4];
+                        $comment = $matches[4];
 
                         // Any strings until the next tag belong to this comment.
                         if (isset($tokens[$commentStart]['comment_tags'][($pos + 1)]) === true) {
@@ -339,7 +343,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
 
                         for ($i = ($tag + 3); $i < $end; $i++) {
                             if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
-                                $comment .= ' '.$tokens[$i]['content'];
+                                $comment .= ' ' . $tokens[$i]['content'];
                             }
                         }
                     }
@@ -352,19 +356,19 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                 $phpcsFile->addError($error, $tag, 'MissingParamType');
             }//end if
 
-            $params[] = array(
-                'tag'        => $tag,
-                'type'       => $type,
-                'var'        => $var,
-                'comment'    => $comment,
+            $params[] = [
+                'tag' => $tag,
+                'type' => $type,
+                'var' => $var,
+                'comment' => $comment,
                 'type_space' => $typeSpace,
-                'var_space'  => $varSpace,
-            );
+                'var_space' => $varSpace,
+            ];
         }//end foreach
 
         // Check for params validity and spacing
-        $realParams  = $phpcsFile->getMethodParameters($stackPtr);
-        $foundParams = array();
+        $realParams = $phpcsFile->getMethodParameters($stackPtr);
+        $foundParams = [];
 
         foreach ($params as $pos => $param) {
             if ($param['var'] === '') {
@@ -377,14 +381,14 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             $spaces = 1;
             if ($param['type_space'] !== $spaces) {
                 $error = 'Expected %s spaces after parameter type; %s found';
-                $data  = array(
+                $data = [
                     $spaces,
                     $param['type_space'],
-                );
+                ];
 
                 $fix = $phpcsFile->addFixableError($error, $param['tag'], 'SpacingAfterParamType', $data);
                 if ($fix === true) {
-                    $content  = $param['type'];
+                    $content = $param['type'];
                     $content .= str_repeat(' ', $spaces);
                     $content .= $param['var'];
                     $content .= str_repeat(' ', $param['var_space']);
@@ -398,15 +402,15 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
                 $realName = $realParams[$pos]['name'];
                 if ($realName !== $param['var']) {
                     $code = 'ParamNameNoMatch';
-                    $data = array(
+                    $data = [
                         $param['var'],
                         $realName,
-                    );
+                    ];
 
                     $error = 'Doc comment for parameter %s does not match ';
                     if (strtolower($param['var']) === strtolower($realName)) {
                         $error .= 'case of ';
-                        $code   = 'ParamNameNoCaseMatch';
+                        $code = 'ParamNameNoCaseMatch';
                     }
 
                     $error .= 'actual variable name %s';
@@ -427,14 +431,14 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             $spaces = 1;
             if ($param['var_space'] !== $spaces) {
                 $error = 'Expected %s spaces after parameter name; %s found';
-                $data  = array(
+                $data = [
                     $spaces,
                     $param['var_space'],
-                );
+                ];
 
                 $fix = $phpcsFile->addFixableError($error, $param['tag'], 'SpacingAfterParamName', $data);
                 if ($fix === true) {
-                    $content  = $param['type'];
+                    $content = $param['type'];
                     $content .= str_repeat(' ', $param['type_space']);
                     $content .= $param['var'];
                     $content .= str_repeat(' ', $spaces);
@@ -444,7 +448,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             }
         }//end foreach
 
-        $realNames = array();
+        $realNames = [];
         foreach ($realParams as $realParam) {
             $realNames[] = $realParam['name'];
         }
@@ -454,7 +458,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements Sniff {
             $diff = array_diff($realNames, $foundParams);
             foreach ($diff as $neededParam) {
                 $error = 'Doc comment for parameter "%s" missing';
-                $data  = array($neededParam);
+                $data = [$neededParam];
                 $phpcsFile->addError($error, $commentStart, 'MissingParamTag', $data);
             }
         }

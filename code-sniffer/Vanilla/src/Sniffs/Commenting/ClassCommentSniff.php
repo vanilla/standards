@@ -1,10 +1,10 @@
 <?php
 /**
- * Parses and verifies the doc comments for classes.
- *
- * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
+
+namespace Vanilla\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -18,7 +18,7 @@ use PHP_CodeSniffer\Util\Tokens;
  *  <li>A class doc comment exists.</li>
  * </ul>
  */
-class Vanilla_Sniffs_Commenting_ClassCommentSniff implements Sniff {
+class ClassCommentSniff implements Sniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -26,10 +26,10 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements Sniff {
      * @return array
      */
     public function register() {
-        return array(
+        return [
             T_CLASS,
-            T_INTERFACE
-        );
+            T_INTERFACE,
+        ];
     }
 
 
@@ -37,14 +37,14 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements Sniff {
      * Processes this test, when one of its tokens is encountered.
      *
      * @param File $phpcsFile The file being scanned.
-     * @param int $stackPtr  The position of the current token in the stack passed in $tokens.
+     * @param int $stackPtr The position of the current token in the stack passed in $tokens.
      *
      * @return void
      */
     public function process(File $phpcsFile, $stackPtr) {
-        $tokens    = $phpcsFile->getTokens();
+        $tokens = $phpcsFile->getTokens();
 
-        $find   = Tokens::$methodPrefixes;
+        $find = Tokens::$methodPrefixes;
         $find[] = T_WHITESPACE;
 
         $commentEnd = $phpcsFile->findPrevious($find, ($stackPtr - 1), null, true);
@@ -52,6 +52,7 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements Sniff {
             && $tokens[$commentEnd]['code'] !== T_COMMENT
         ) {
             $phpcsFile->addError('Missing class doc comment', $stackPtr, 'Missing');
+
             return;
         }
 
@@ -71,6 +72,7 @@ class Vanilla_Sniffs_Commenting_ClassCommentSniff implements Sniff {
                 // This is a comment directly after the first open tag,
                 // so probably a file comment.
                 $phpcsFile->addError('Missing class doc comment', $stackPtr, 'Missing');
+
                 return;
             }
         }

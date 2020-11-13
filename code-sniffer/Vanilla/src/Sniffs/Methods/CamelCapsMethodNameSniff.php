@@ -1,16 +1,10 @@
 <?php
 /**
- * PSR1_Sniffs_Methods_CamelCapsMethodNameSniff.
- *
- * PHP version 5
- *
- * @category  PHP
- * @package   PHP_CodeSniffer
- * @author    Greg Sherwood <gsherwood@squiz.net>
- * @copyright 2006-2012 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @link      http://pear.php.net/package/PHP_CodeSniffer
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
+
+namespace Vanilla\Sniffs\Methods;
 
 use PHP_CodeSniffer\Sniffs\AbstractScopeSniff;
 use PHP_CodeSniffer\Files\File;
@@ -29,21 +23,19 @@ use PHP_CodeSniffer\Util\Common;
  * @version   Release: @package_version@
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
-{
+class CamelCapsMethodNameSniff extends AbstractScopeSniff {
 
     protected $magicMethods = [
         '__construct', '__destruct', '__call', '__callStatic', '__get', '__set', '__isset', '__unset',
-        '__sleep', '__wakeup', '__toString', '__invoke', '__set_state', '__clone', 'debugInfo()'
+        '__sleep', '__wakeup', '__toString', '__invoke', '__set_state', '__clone', 'debugInfo()',
     ];
 
 
     /**
      * Constructs a PSR1_Sniffs_Methods_CamelCapsMethodNameSniff.
      */
-    public function __construct()
-    {
-        parent::__construct(array(T_CLASS, T_INTERFACE, T_TRAIT), array(T_FUNCTION), true);
+    public function __construct() {
+        parent::__construct([T_CLASS, T_INTERFACE, T_TRAIT], [T_FUNCTION], true);
 
     }//end __construct()
 
@@ -52,13 +44,12 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
      * Processes the tokens within the scope.
      *
      * @param File $phpcsFile The file being processed.
-     * @param int $stackPtr  The position where this token was found.
+     * @param int $stackPtr The position where this token was found.
      * @param int $currScope The position of the current scope.
      *
      * @return void
      */
-    protected function processTokenWithinScope(File $phpcsFile, $stackPtr, $currScope)
-    {
+    protected function processTokenWithinScope(File $phpcsFile, $stackPtr, $currScope) {
         $methodName = $phpcsFile->getDeclarationName($stackPtr);
         if ($methodName === null) {
             // Ignore closures.
@@ -74,16 +65,16 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
 
         if (self::isVanillaMethod($testName) === true) {
             if ($this->processVanillaMethod($testName) === false) {
-                $error     = 'Method name "%s" is not in valid vanilla format';
+                $error = 'Method name "%s" is not in valid vanilla format';
                 $className = $phpcsFile->getDeclarationName($currScope);
-                $errorData = array($className.'::'.$methodName);
+                $errorData = [$className . '::' . $methodName];
                 $phpcsFile->addError($error, $stackPtr, 'NotVanilla', $errorData);
             }
 
         } elseif (!Common::isCamelCaps($testName, false, true, false)) {
-            $error     = 'Method name "%s" is not in camel caps format';
+            $error = 'Method name "%s" is not in camel caps format';
             $className = $phpcsFile->getDeclarationName($currScope);
-            $errorData = array($className.'::'.$methodName);
+            $errorData = [$className . '::' . $methodName];
             $phpcsFile->addError($error, $stackPtr, 'NotCamelCaps', $errorData);
         }
 
@@ -96,7 +87,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
      * @return bool
      */
     public static function isVanillaMethod($name) {
-        $patterns = array(
+        $patterns = [
             '_handler',
             '_create',
             '_before',
@@ -111,12 +102,13 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
             'put_',
             'options_',
             'delete_',
-        );
+        ];
         foreach ($patterns as $pattern) {
             if (stristr($name, $pattern) !== false) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -128,6 +120,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
                 return false;
             }
         }
+
         return true;
     }
 
@@ -136,12 +129,11 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
      * Processes the tokens outside the scope.
      *
      * @param File $phpcsFile The file being processed.
-     * @param int $stackPtr  The position where this token was found.
+     * @param int $stackPtr The position where this token was found.
      *
      * @return void
      */
-    protected function processTokenOutsideScope(File $phpcsFile, $stackPtr)
-    {
+    protected function processTokenOutsideScope(File $phpcsFile, $stackPtr) {
         $functionName = $phpcsFile->getDeclarationName($stackPtr);
         if ($functionName === null) {
             // Ignore closures.
@@ -153,16 +145,16 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends AbstractScopeSniff
             $parts = preg_split('/_/', $functionName);
             foreach ($parts as $part) {
                 if ($part != strtolower($part)) {
-                    $error     = 'Function name "%s" should all be lowercase';
-                    $errorData = array($functionName);
+                    $error = 'Function name "%s" should all be lowercase';
+                    $errorData = [$functionName];
                     $phpcsFile->addError($error, $stackPtr, 'globalFunctionNaming', $errorData);
                 }
             }
 
         } else {
             if (Common::isCamelCaps($functionName, false, true, false) === false) {
-                $error     = 'Function name "%s" is not in valid vanilla format';
-                $errorData = array($functionName);
+                $error = 'Function name "%s" is not in valid vanilla format';
+                $errorData = [$functionName];
                 $phpcsFile->addError($error, $stackPtr, 'globalFunctionNaming', $errorData);
             }
         }
